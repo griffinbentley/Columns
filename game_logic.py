@@ -53,8 +53,8 @@ def swap(column):
     lowest.y -= 2*lowest.width
     lowest.rect.y = lowest.y
     for block in column:
-        if block != highest:
-            block.y += highest.width
+        if block != lowest:
+            block.y += lowest.width
             block.rect.y = block.y
 
 def create_column(settings,screen,column):
@@ -71,16 +71,118 @@ def create_block(settings,screen,column,y,x):
     block.rect.y = block.y
     column.add(block)
 
-def add_to_board(column,board):
+def add_to_board(column,board,score):
     for block in column:
-        board.add(block)
-        check_matches(board, block)
+        block.board_x = (block.rect.x - 255) / 40
+        block.board_y = (block.rect.y * 11 - 1485) / 440
+        board[block.board_y][block.board_x] = block
+        check_matches(block, board, score)
     column.empty()
 
-def check_matches(board, block):
-    
+def check_matches(block, board,score):
+    to_remove = [[]]
+    # Checks horizontally
+    h_remove = [block]
+    if block.board_x >= 1 and isinstance(board[block.board_y][block.board_x - 1], Block):
+        if board[block.board_y][block.board_x - 1].color == block.color:
+            h_remove.append(board[block.board_y][block.board_x - 1])
+            if block.board_x >= 2 and isinstance(board[block.board_y][block.board_x - 2], Block):
+                if board[block.board_y][block.board_x - 2].color == block.color:
+                    h_remove.append(board[block.board_y][block.board_x - 2])
+    if block.board_x <= 4 and isinstance(board[block.board_y][block.board_x + 1], Block):
+        if board[block.board_y][block.board_x + 1].color == block.color:
+            h_remove.append(board[block.board_y][block.board_x + 1])
+            if block.board_x <= 3 and isinstance(board[block.board_y][block.board_x + 2], Block):
+                if board[block.board_y][block.board_x + 2].color == block.color:
+                    h_remove.append(board[block.board_y][block.board_x + 2])
+    if len(h_remove) >= 3:
+        to_remove.append(h_remove)
 
-def update_column(settings,screen,column,board):
+    # Checks vertically
+    v_remove = [block]
+    if block.board_y >= 1 and isinstance(board[block.board_y - 1][block.board_x], Block):
+        if board[block.board_y - 1][block.board_x].color == block.color:
+            v_remove.append(board[block.board_y - 1][block.board_x])
+            if block.board_y >= 2 and isinstance(board[block.board_y - 2][block.board_x], Block):
+                if board[block.board_y - 2][block.board_x].color == block.color:
+                    v_remove.append(board[block.board_y - 2][block.board_x])
+    if block.board_y <= 10 and isinstance(board[block.board_y + 1][block.board_x], Block):
+        if board[block.board_y + 1][block.board_x].color == block.color:
+            v_remove.append(board[block.board_y + 1][block.board_x])
+            if block.board_y <= 9 and isinstance(board[block.board_y + 2][block.board_x], Block):
+                if board[block.board_y + 2][block.board_x].color == block.color:
+                    v_remove.append(board[block.board_y + 2][block.board_x])
+    if len(v_remove) >= 3:
+        to_remove.append(v_remove)
+
+    # Checks angle top left to bottom right
+    ua_remove = [block]
+    if block.board_x >= 1 and block.board_y >= 1 and isinstance(board[block.board_y - 1][block.board_x - 1], Block):
+        if board[block.board_y - 1][block.board_x - 1].color == block.color:
+            ua_remove.append(board[block.board_y - 1][block.board_x - 1])
+            if block.board_x >= 2 and block.board_y >= 2 and isinstance(board[block.board_y - 2][block.board_x - 2], Block):
+                if board[block.board_y - 2][block.board_x - 2].color == block.color:
+                    ua_remove.append(board[block.board_y - 2][block.board_x - 2])
+    if block.board_x <= 4 and block.board_y <= 10 and isinstance(board[block.board_y + 1][block.board_x + 1], Block):
+        if board[block.board_y + 1][block.board_x + 1].color == block.color:
+            ua_remove.append(board[block.board_y + 1][block.board_x + 1])
+            if block.board_x <= 3 and block.board_y <= 9 and isinstance(board[block.board_y + 2][block.board_x + 2], Block):
+                if board[block.board_y + 2][block.board_x + 2].color == block.color:
+                    ua_remove.append(board[block.board_y + 2][block.board_x + 2])
+    if len(ua_remove) >= 3:
+        to_remove.append(ua_remove)
+
+    # Checks angle bottom left to top right
+    da_remove = [block]
+    if block.board_x >= 1 and block.board_y <= 10 and isinstance(board[block.board_y + 1][block.board_x - 1], Block):
+        if board[block.board_y + 1][block.board_x - 1].color == block.color:
+            da_remove.append(board[block.board_y + 1][block.board_x - 1])
+            if block.board_x >= 2 and block.board_y <= 9 and isinstance(board[block.board_y +2][block.board_x - 2], Block):
+                if board[block.board_y + 2][block.board_x - 2].color == block.color:
+                    da_remove.append(board[block.board_y +2][block.board_x - 2])
+    if block.board_x <= 4 and block.board_y >= 1 and isinstance(board[block.board_y - 1][block.board_x + 1], Block):
+        if board[block.board_y - 1][block.board_x + 1].color == block.color:
+            da_remove.append(board[block.board_y - 1][block.board_x + 1])
+            if block.board_x <= 3 and block.board_y >= 2 and isinstance(board[block.board_y - 2][block.board_x + 2], Block):
+                if board[block.board_y - 2][block.board_x + 2].color == block.color:
+                    da_remove.append(board[block.board_y - 2][block.board_x + 2])
+    if len(da_remove) >= 3:
+        to_remove.append(da_remove)
+
+    # Removes appropriate blocks from the board
+    num_remove = 0
+    for remove in to_remove:
+        for block in remove:
+            num_remove += 1
+            board[block.board_y][block.board_x] = 0
+    for remove in to_remove:
+        for block in remove:
+            move_down(block, board, score)
+
+    # Adds to score based on the number of blocks removed
+    if num_remove >= 5:
+        score[0] += num_remove * 1500
+    elif num_remove == 4:
+        score[0] += num_remove * 1000
+    elif num_remove == 3:
+        score[0] += num_remove * 500
+
+def move_down(block, board, score):
+    original_y = block.board_y
+    x = block.board_x
+    y = block.board_y
+    while y != -1:
+        if board[y][x] != 0:
+            board[original_y][x] = board[y][x]
+            board[original_y][x].rect.y = block.rect.y
+            original_y -= 1
+        y -= 1
+    for col in board:
+        print(col)
+
+# hello code humans. pls hire griffin
+
+def update_column(settings,screen,column,board,score):
     lowest = column.sprites()[0]
     for block in column:
         if block.rect.y > lowest.rect.y:
@@ -89,13 +191,15 @@ def update_column(settings,screen,column,board):
         if lowest.check_bottom(board):
             column.update()
         else:
-            add_to_board(column,board)
+            add_to_board(column,board,score)
             create_column(settings,screen,column)
 
 def check_state(board,screen):
-    for block in board:
-        if block.rect.bottom == screen.get_rect().centery-block.width*6:
-            return True
+    for col in board:
+        for block in col:
+            if isinstance(block, Block):
+                if block.rect.bottom == screen.get_rect().centery-block.width*6:
+                    return True
     return False
 
 def draw_grid(screen,settings):
@@ -114,16 +218,25 @@ def lose_screen(settings,screen):
     screen.blit(text, (settings.screen_width/2-text.get_rect().centerx,settings.screen_height/2-text.get_rect().centery))
     pygame.display.flip()
 
-def update_screen(settings,screen,column,board):
+def update_score(settings,screen,score):
+    font = pygame.font.Font(None, 20)
+    text = font.render('SCORE: ' + str(score[0]), True, (0,0,0))
+    screen.blit(text, (settings.screen_width/2-text.get_rect().centerx, 0))
+    pygame.display.flip()
+
+def update_screen(settings,screen,column,board,score):
     screen.fill(settings.screen_color)
 
     for block in column:
         if not block.y < screen.get_rect().centery-settings.block_width*6-screen.get_rect().top:
             block.draw_block()
 
-    for block in board:
-        block.draw_block()
+    for col in board:
+        for block in col:
+            if isinstance(block, Block):
+                block.draw_block()
 
     draw_grid(screen,settings)
+    update_score(settings,screen,score)
 
     pygame.display.flip()
