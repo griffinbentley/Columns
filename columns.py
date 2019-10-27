@@ -13,15 +13,17 @@ def run_game():
 
     column = Group()
 
-    board = Group()
+    board = [[0] * 6 for i in xrange(12)]
 
     gl.create_column(settings,screen,column)
+
+    score = [0]
 
     while not lose:
         if gl.check_events(column,board):
             run_game()
-        gl.update_screen(settings,screen,column,board)
-        gl.update_column(settings,screen,column,board)
+        gl.update_screen(settings,screen,column,board,score)
+        gl.update_column(settings,screen,column,board,score)
         lose = gl.check_state(board,screen)
 
     if lose:
