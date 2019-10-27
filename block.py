@@ -10,6 +10,9 @@ class Block(Sprite):
         self.rect = pygame.Rect(0,0,settings.block_width,settings.block_width)
         self.width = settings.block_width
 
+        self.board_x = 0
+        self.board_y = 0
+
         self.y = float(self.rect.y)
         self.center = float(self.rect.centerx)
 
@@ -35,9 +38,11 @@ class Block(Sprite):
 
     def move_right(self,x,board):
         collide = False
-        for block in board:
-            if block.rect.left == self.rect.right and block.rect.y == self.rect.y:
-                collide = True
+        for col in board:
+            for block in col:
+                if isinstance(block, Block):
+                    if block.rect.left == self.rect.right and block.rect.y == self.rect.y:
+                        collide = True
 
         if self.rect.right < self.screen.get_rect().centerx+self.width*3 and not collide:
             self.center = x
@@ -49,9 +54,11 @@ class Block(Sprite):
 
     def move_left(self,x,board):
         collide = False
-        for block in board:
-            if block.rect.right == self.rect.left and block.rect.y == self.rect.y:
-                collide = True
+        for col in board:
+            for block in col:
+                if isinstance(block, Block):
+                    if block.rect.right == self.rect.left and block.rect.y == self.rect.y:
+                        collide = True
 
         if self.rect.left > self.screen.get_rect().centerx-self.width*3 and not collide:
             self.center = x
@@ -63,9 +70,11 @@ class Block(Sprite):
 
     def check_bottom(self,board):
         collide = False
-        for block in board:
-            if block.rect.top == self.rect.bottom and block.rect.x == self.rect.x:
-                collide = True
+        for col in board:
+            for block in col:
+                if isinstance(block, Block):
+                    if block.rect.top == self.rect.bottom and block.rect.x == self.rect.x:
+                        collide = True
 
         if self.rect.bottom < self.screen.get_rect().centery+self.width*6 and not collide:
             return True
