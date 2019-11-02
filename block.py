@@ -16,7 +16,7 @@ class Block(Sprite):
         self.y = float(self.rect.y)
         self.center = float(self.rect.centerx)
 
-        self.color,self.color_value = settings.colors[random.randint(0,9)]
+        self.color,self.color_value = settings.colors[random.randint(0,len(settings.colors) - 1)]
 
         self.last = pygame.time.get_ticks()
 
