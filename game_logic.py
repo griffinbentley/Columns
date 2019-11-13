@@ -184,8 +184,6 @@ def check_matches(settings, screen, blocks, board, score):
             cols.add(block.board_x)
     column = Group()
     update_screen(settings, screen, column, board, score)
-    if len(remove) != 0:
-        pygame.time.wait(1000)
 
     # Adds to score based on the number of blocks removed.
     if num_remove >= 5:
@@ -194,6 +192,10 @@ def check_matches(settings, screen, blocks, board, score):
         score[0] += num_remove * 1000
     elif num_remove == 3:
         score[0] += num_remove * 500
+
+    # Pauses if anything was removed so that the user can better understand what's happening.
+    if len(remove) != 0:
+        pygame.time.wait(1000)
 
     # Returns the cols so that they can be checked in move_down.
     return cols
@@ -215,6 +217,8 @@ def move_down(settings, screen, columns, board, score):
             else:
                 y -= 1
     column = Group()
+
+    # If anything got moved down, update the screen and then wait for clarity.
     if len(blocks) != 0:
         update_screen(settings, screen, column, board, score)
         pygame.time.wait(1000)
